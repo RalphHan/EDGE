@@ -23,6 +23,21 @@ def slice_audio(audio_file, stride, length, out_dir):
         idx += 1
     return idx
 
+def slice_audio2(audio_pair, file_name, stride, length, out_dir):
+    # stride, length in seconds
+    sr, audio = audio_pair
+    if len(audio.shape) == 2:
+        audio = audio[:,0]
+    start_idx = 0
+    idx = 0
+    window = int(length * sr)
+    stride_step = int(stride * sr)
+    while start_idx <= len(audio) - window:
+        audio_slice = audio[start_idx : start_idx + window]
+        sf.write(f"{out_dir}/{file_name}_slice{idx}.wav", audio_slice, sr)
+        start_idx += stride_step
+        idx += 1
+    return idx
 
 def slice_motion(motion_file, stride, length, num_slices, out_dir):
     motion = pickle.load(open(motion_file, "rb"))
