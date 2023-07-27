@@ -205,20 +205,21 @@ def skeleton_render(
         else:
             contact = contact > 0.95
 
+        new_fps=10
         # Creating the Animation object
         anim = animation.FuncAnimation(
             fig,
             plot_single_pose,
-            num_steps,
+            range(0,num_steps,30//new_fps),
             fargs=(poses, lines, ax, axrange, scat, contact),
-            interval=1000 // 30,
+            interval=1000 // new_fps,
         )
     if sound:
         # make a temporary directory to save the intermediate gif in
         if render:
             temp_dir = TemporaryDirectory()
-            gifname = os.path.join(temp_dir.name, f"{epoch}.gif")
-            anim.save(gifname)
+            gifname = os.path.join(temp_dir.name, f"{epoch}.mp4")
+            anim.save(gifname, writer="ffmpeg")
 
         # stitch wavs
         if stitch:
@@ -248,15 +249,17 @@ def skeleton_render(
                 out, f"{epoch}_{os.path.splitext(os.path.basename(name))[0]}.mp4"
             )
         if render:
-            out = os.system(
-                f"ffmpeg -loglevel error -stream_loop 0 -y -i {gifname} -i {audioname} -shortest -c:v libx264 -crf 26 -c:a aac -q:a 4 {outname}"
-            )
+            from moviepy.editor import VideoFileClip, AudioFileClip
+            video = VideoFileClip(gifname)
+            audio = AudioFileClip(audioname)
+            video_with_audio = video.set_audio(audio)
+            video_with_audio.write_videofile(outname, audio_codec='aac')
     else:
         if render:
             # actually save the gif
             path = os.path.normpath(name)
             pathparts = path.split(os.sep)
-            gifname = os.path.join(out, f"{pathparts[-1][:-4]}.gif")
+            gifname = os.path.join(out, f"{pathparts[-1][:-4]}.mp4")
             anim.save(gifname, savefig_kwargs={"transparent": True, "facecolor": "none"},)
     plt.close()
 

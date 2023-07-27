@@ -6,7 +6,6 @@ from pathlib import Path
 
 import torch
 import torch.nn.functional as F
-import wandb
 from accelerate import Accelerator, DistributedDataParallelKwargs
 from accelerate.state import AcceleratorState
 from torch.utils.data import DataLoader
@@ -183,7 +182,6 @@ class EDGE:
         if self.accelerator.is_main_process:
             save_dir = str(increment_path(Path(opt.project) / opt.exp_name))
             opt.exp_name = save_dir.split("/")[-1]
-            wandb.init(project=opt.wandb_pj_name, name=opt.exp_name)
             save_dir = Path(save_dir)
             wdir = save_dir / "weights"
             wdir.mkdir(parents=True, exist_ok=True)
@@ -235,7 +233,6 @@ class EDGE:
                         "FK Loss": avg_fkloss,
                         "Foot Loss": avg_footloss,
                     }
-                    wandb.log(log_dict)
                     ckpt = {
                         "ema_state_dict": self.diffusion.master_model.state_dict(),
                         "model_state_dict": self.accelerator.unwrap_model(
@@ -262,8 +259,6 @@ class EDGE:
                         sound=True,
                     )
                     print(f"[MODEL SAVED at Epoch {epoch}]")
-        if self.accelerator.is_main_process:
-            wandb.run.finish()
 
     def render_sample(
         self, data_tuple, label, render_dir, render_count=-1, fk_out=None, render=True
