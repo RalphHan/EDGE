@@ -261,7 +261,7 @@ class EDGE:
                     print(f"[MODEL SAVED at Epoch {epoch}]")
 
     def render_sample(
-        self, data_tuple, label, render_dir, render_count=-1, fk_out=None, render=True
+        self, data_tuple, label, render_dir, render_count=-1, fk_out=None, render=True, the_uuid=None
     ):
         _, cond, wavname = data_tuple
         assert len(cond.shape) == 3
@@ -279,5 +279,6 @@ class EDGE:
             sound=True,
             mode="long",
             fk_out=fk_out,
-            render=render
+            render=render,
+            the_uuid=the_uuid,
         )

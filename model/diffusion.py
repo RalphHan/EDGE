@@ -1,4 +1,5 @@
 import copy
+import json
 import os
 import pickle
 from pathlib import Path
@@ -554,7 +555,8 @@ class GaussianDiffusion(nn.Module):
         constraint=None,
         sound_folder="ood_sliced",
         start_point=None,
-        render=True
+        render=True,
+        the_uuid=None,
     ):
         if isinstance(shape, tuple):
             if mode == "inpaint":
@@ -646,31 +648,36 @@ class GaussianDiffusion(nn.Module):
             else:
                 full_pos = pos
                 full_q = q
-            full_pose = (
-                self.smpl.forward(full_q, full_pos).detach().cpu().numpy()
-            )  # b, s, 24, 3
+            if the_uuid:
+                with open(f"{render_out}/test_{the_uuid}.json","w") as f:
+                    json.dump({"root_positions": full_pos.squeeze(0).cpu().numpy().tolist(),
+                               "rotations": full_q.squeeze(0).cpu().numpy().tolist()}, f, indent=4)
             # squeeze the batch dimension away and render
-            skeleton_render(
-                full_pose[0],
-                epoch=f"{epoch}",
-                out=render_out,
-                name=name,
-                sound=sound,
-                stitch=True,
-                sound_folder=sound_folder,
-                render=render
-            )
-            if fk_out is not None:
-                outname = f'{epoch}_{"_".join(os.path.splitext(os.path.basename(name[0]))[0].split("_")[:-1])}.pkl'
-                Path(fk_out).mkdir(parents=True, exist_ok=True)
-                pickle.dump(
-                    {
-                        "smpl_poses": full_q.squeeze(0).reshape((-1, 72)).cpu().numpy(),
-                        "smpl_trans": full_pos.squeeze(0).cpu().numpy(),
-                        "full_pose": full_pose[0],
-                    },
-                    open(os.path.join(fk_out, outname), "wb"),
+            if render:
+                full_pose = (
+                    self.smpl.forward(full_q, full_pos).detach().cpu().numpy()
+                )  # b, s, 24, 3
+                skeleton_render(
+                    full_pose[0],
+                    epoch=f"{epoch}",
+                    out=render_out,
+                    name=name,
+                    sound=sound,
+                    stitch=True,
+                    sound_folder=sound_folder,
+                    render=render
                 )
+                if fk_out is not None:
+                    outname = f'{epoch}_{"_".join(os.path.splitext(os.path.basename(name[0]))[0].split("_")[:-1])}.pkl'
+                    Path(fk_out).mkdir(parents=True, exist_ok=True)
+                    pickle.dump(
+                        {
+                            "smpl_poses": full_q.squeeze(0).reshape((-1, 72)).cpu().numpy(),
+                            "smpl_trans": full_pos.squeeze(0).cpu().numpy(),
+                            "full_pose": full_pose[0],
+                        },
+                        open(os.path.join(fk_out, outname), "wb"),
+                    )
             return
 
         poses = self.smpl.forward(q, pos).detach().cpu().numpy()

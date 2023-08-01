@@ -45,7 +45,7 @@ def init():
     model.eval()
     return opt,model
 
-def dance(audio,opt,model):
+def dance(render, audio,opt,model):
     feature_func = juke_extract if opt.feature_type == "jukebox" else baseline_extract
     all_cond = []
     all_filenames = []
@@ -71,19 +71,21 @@ def dance(audio,opt,model):
     for i in range(len(all_cond)):
         data_tuple = None, all_cond[i], all_filenames[i]
         model.render_sample(
-            data_tuple, "test", opt.render_dir, render_count=-1, fk_out=opt.render_dir, render=not opt.no_render
+            data_tuple, "test", opt.render_dir, render_count=-1, render=render, the_uuid=the_uuid
         )
     print("Done")
     torch.cuda.empty_cache()
     temp_dir.cleanup()
-    return f"{opt.render_dir}/test_{the_uuid}.mp4"
+    if render:
+        return f"{opt.render_dir}/test_{the_uuid}.mp4",f"{opt.render_dir}/test_{the_uuid}.json"
+    return None, f"{opt.render_dir}/test_{the_uuid}.json"
 
 
 if __name__ == "__main__":
     opt, model = init()
     demo = gr.Interface(
-        lambda audio: dance(audio,opt, model),
-        [gr.Audio(value="custom_music/9i6bCWIdhBw.mp3",label="超过30s则随机选30秒",source="upload")],
-        [gr.Video(format="mp4",autoplay=True)],
+        lambda render, audio: dance(render, audio, opt, model),
+        [gr.Checkbox(value=True, label="render"), gr.Audio(value="custom_music/9i6bCWIdhBw.mp3",label="超过30s则随机选30秒",source="upload")],
+        [gr.Video(format="mp4",autoplay=True), gr.File()],
     )
     demo.launch(server_name='0.0.0.0',server_port=7866)
