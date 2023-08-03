@@ -649,9 +649,13 @@ class GaussianDiffusion(nn.Module):
                 full_pos = pos
                 full_q = q
             if the_uuid:
-                with open(f"{render_out}/test_{the_uuid}.json","w") as f:
-                    json.dump({"root_positions": full_pos.squeeze(0).cpu().numpy().tolist(),
-                               "rotations": full_q.squeeze(0).cpu().numpy().tolist()}, f, indent=4)
+                with open(f"{render_out}/test_{the_uuid}.json", "w") as f:
+                    quaternion = axis_angle_to_quaternion(full_q).squeeze(0).cpu().numpy()
+                    json.dump({"root_positions": full_pos.squeeze(0).cpu().numpy().flatten().tolist(),
+                               "rotations": quaternion.flatten().tolist(),
+                               "fps": 30,
+                               "mode": "quaternion",
+                               "n_frames": quaternion.shape[0]}, f, indent=4)
             # squeeze the batch dimension away and render
             if render:
                 full_pose = (

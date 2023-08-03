@@ -16,3 +16,4 @@ __pycache__/
 *.zip
 cached_features/
 custom_music/
+flagged/
