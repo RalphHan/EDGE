@@ -17,3 +17,5 @@ __pycache__/
 cached_features/
 custom_music/
 flagged/
+SMPL-to-FBX/motions/
+SMPL-to-FBX/fbx_out/
