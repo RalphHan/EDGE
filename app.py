@@ -71,7 +71,7 @@ def dance(render, audio,opt,model):
     for i in range(len(all_cond)):
         data_tuple = None, all_cond[i], all_filenames[i]
         model.render_sample(
-            data_tuple, "test", opt.render_dir, render_count=-1, render=render, the_uuid=the_uuid
+            data_tuple, "test", opt.render_dir, fk_out=True, render_count=-1, render=render, the_uuid=the_uuid
         )
     print("Done")
     torch.cuda.empty_cache()

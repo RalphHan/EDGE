@@ -680,16 +680,14 @@ class GaussianDiffusion(nn.Module):
                     sound_folder=sound_folder,
                     render=render
                 )
-                if fk_out is not None:
-                    outname = f'{epoch}_{"_".join(os.path.splitext(os.path.basename(name[0]))[0].split("_")[:-1])}.pkl'
-                    Path(fk_out).mkdir(parents=True, exist_ok=True)
+                if fk_out:
                     pickle.dump(
                         {
                             "smpl_poses": full_q.squeeze(0).reshape((-1, 72)).cpu().numpy(),
                             "smpl_trans": full_pos.squeeze(0).cpu().numpy(),
                             "full_pose": full_pose[0],
                         },
-                        open(os.path.join(fk_out, outname), "wb"),
+                        open(f"{render_out}/pos_{the_uuid}.pkl", "wb"),
                     )
             return
 
