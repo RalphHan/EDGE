@@ -655,7 +655,8 @@ class GaussianDiffusion(nn.Module):
                                "rotations": quaternion.flatten().tolist(),
                                "fps": 30,
                                "mode": "quaternion",
-                               "n_frames": quaternion.shape[0]}, f, indent=4)
+                               "n_frames": quaternion.shape[0],
+                               "n_joints": 24}, f, indent=4)
             # squeeze the batch dimension away and render
             if render:
                 full_pose = (
