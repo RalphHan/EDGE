@@ -77,8 +77,8 @@ def dance(render, audio,opt,model):
     torch.cuda.empty_cache()
     temp_dir.cleanup()
     if render:
-        return f"{opt.render_dir}/test_{the_uuid}.mp4",f"{opt.render_dir}/test_{the_uuid}.json"
-    return None, f"{opt.render_dir}/test_{the_uuid}.json"
+        return f"{opt.render_dir}/test_{the_uuid}.mp4", f"{opt.render_dir}/quaternion_{the_uuid}.json", f"{opt.render_dir}/axis_angle_{the_uuid}.json"
+    return None, f"{opt.render_dir}/quaternion_{the_uuid}.json", f"{opt.render_dir}/axis_angle_{the_uuid}.json"
 
 
 if __name__ == "__main__":
@@ -86,6 +86,6 @@ if __name__ == "__main__":
     demo = gr.Interface(
         lambda render, audio: dance(render, audio, opt, model),
         [gr.Checkbox(value=True, label="render"), gr.Audio(value="custom_music/9i6bCWIdhBw.mp3",label="超过30s则随机选30秒",source="upload")],
-        [gr.Video(format="mp4",autoplay=True), gr.File()],
+        [gr.Video(format="mp4",autoplay=True), gr.File(), gr.File()],
     )
     demo.launch(server_name='0.0.0.0',server_port=7866)
