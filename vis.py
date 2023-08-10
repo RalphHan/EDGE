@@ -168,7 +168,8 @@ def skeleton_render(
     stitch=False,
     sound_folder="ood_sliced",
     contact=None,
-    render=True
+    render=True,
+    the_uuid=None,
 ):
     if render:
         # generate the pose with FK
@@ -239,14 +240,14 @@ def skeleton_render(
             sf.write(audioname, total_wav, sr)
             outname = os.path.join(
                 out,
-                f'{epoch}_{"_".join(os.path.splitext(os.path.basename(name[0]))[0].split("_")[:-1])}.mp4',
+                f'{the_uuid}.mp4',
             )
         else:
             assert type(name) == str
             assert name != "", "Must provide an audio filename"
             audioname = name
             outname = os.path.join(
-                out, f"{epoch}_{os.path.splitext(os.path.basename(name))[0]}.mp4"
+                out, f"{the_uuid}.mp4"
             )
         if render:
             from moviepy.editor import VideoFileClip, AudioFileClip
@@ -254,6 +255,7 @@ def skeleton_render(
             audio = AudioFileClip(audioname)
             video_with_audio = video.set_audio(audio)
             video_with_audio.write_videofile(outname, audio_codec='aac')
+            temp_dir.cleanup()
     else:
         if render:
             # actually save the gif
