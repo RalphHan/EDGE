@@ -14,7 +14,7 @@ from p_tqdm import p_map
 from pytorch3d.transforms import (axis_angle_to_quaternion,
                                   quaternion_to_axis_angle)
 from tqdm import tqdm
-
+import binascii
 from dataset.quaternion import ax_from_6v, quat_slerp
 from vis import skeleton_render
 
@@ -651,8 +651,8 @@ class GaussianDiffusion(nn.Module):
             if the_uuid:
                 with open(f"{render_out}/axis_angle_{the_uuid}.json", "w") as f:
                     axis_angle=full_q.squeeze(0).cpu().numpy()
-                    json.dump({"root_positions": full_pos.squeeze(0).cpu().numpy().flatten().tolist(),
-                               "rotations": axis_angle.flatten().tolist(),
+                    json.dump({"root_positions": binascii.b2a_base64(full_pos.squeeze(0).cpu().numpy().flatten().tobytes()).decode("utf-8"),
+                               "rotations": binascii.b2a_base64(axis_angle.flatten().tobytes()).decode("utf-8"),
                                "fps": 30,
                                "mode": "axis_angle",
                                "n_frames": axis_angle.shape[0],

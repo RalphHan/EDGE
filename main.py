@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import glob
 import os
 from functools import cmp_to_key
-from typing import List
+import binascii
 from tempfile import TemporaryDirectory
 import random
 import numpy as np
@@ -96,7 +96,7 @@ def init_data():
 
 class Music(BaseModel):
     sr: int
-    audio: List[float]
+    audio: str
 
 
 @app.get("/video/{uuid}")
@@ -113,7 +113,7 @@ def angle(uuid: str):
 
 @app.post("/edge_data/")
 async def edge_data(music: Music, render: bool = False):
-    audio_pair = (music.sr, np.float32(music.audio))
+    audio_pair = (music.sr, np.frombuffer(binascii.a2b_base64(music.audio),dtype=np.int16))
     return dance(render, audio_pair, data["opt"], data["model"])
 
 
