@@ -97,6 +97,7 @@ def init_data():
 class Music(BaseModel):
     sr: int
     audio: str
+    dtype: str
 
 
 @app.get("/video/{uuid}")
@@ -113,7 +114,7 @@ def angle(uuid: str):
 
 @app.post("/edge_data/")
 async def edge_data(music: Music, render: bool = False):
-    audio_pair = (music.sr, np.frombuffer(binascii.a2b_base64(music.audio),dtype=np.int16))
+    audio_pair = (music.sr, np.frombuffer(binascii.a2b_base64(music.audio),dtype=music.dtype))
     return dance(render, audio_pair, data["opt"], data["model"])
 
 

@@ -11,7 +11,7 @@ def dance(render, audio):
     if len(audio.shape) == 2:
         audio = audio[:, 0]
     ret_json = json.loads(requests.post("http://0.0.0.0:8020/edge_data/",
-                                        json={"sr": sr, "audio": binascii.b2a_base64(audio.tobytes()).decode("utf-8")},
+                                        json={"sr": sr, "audio": binascii.b2a_base64(audio.tobytes()).decode("utf-8"), "dtype": str(audio.dtype)},
                                         params={"render": render}).text)
     the_uuid = ret_json["uuid"]
     video_path = f"{render_dir}/{the_uuid}.mp4" if render else None
