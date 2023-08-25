@@ -86,6 +86,7 @@ def init_data():
     opt = parse_test_opt()
     opt.out_length = 30
     opt.render_dir = "renders/gradio"
+    os.makedirs(opt.render_dir, exist_ok=True)
     sys.argv = old_argv
     model = EDGE(opt.feature_type, opt.checkpoint)
     model.eval()
