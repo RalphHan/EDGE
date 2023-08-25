@@ -87,7 +87,7 @@ def init_data():
     opt.out_length = 30
     opt.render_dir = "renders/gradio"
     sys.argv = old_argv
-    model = EDGE(opt.feature_type, os.getenv("EDGE_CHECKPOINT", opt.checkpoint))
+    model = EDGE(opt.feature_type, opt.checkpoint)
     model.eval()
     data["opt"] = opt
     data["model"] = model
