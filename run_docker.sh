@@ -1,5 +1,5 @@
 docker run -itd \
---gpus 0 \
+--gpus '"device=0"' \
 -v `pwd`:/EDGE \
 --restart always \
 -p 8020:8020 \
