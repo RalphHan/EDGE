@@ -1,5 +1,6 @@
 if [ $# -eq 0 ]; then
     docker run -itd \
+      --name edge \
       --gpus '"device=0"' \
       -v `pwd`:/EDGE \
       --restart always \
